@@ -401,3 +401,128 @@ Upload a PDF document with the commands to be run to solve the following tasks. 
 5. Try to _ping_ from `Ubuntu1` to `Ubuntu2`. Does it work? Why?
 6. Connect `Ubuntu2` to the `DockerNetwork` network.
 7. Try to _ping_ from `Ubuntu1` to `Ubuntu2` again. Does it work? Why?
+
+ - ## PARTE 1
+ ## Procedimiento para crear y ejecutar un contenedor Docker con Nginx y un volumen
+
+En este procedimiento, se explicará cómo crear un contenedor Docker con Nginx y un volumen. Para ello, se utilizarán los siguientes comandos en una terminal:
+1. Crear un volumen Docker con el siguiente comando:
+
+```bash
+docker volume create volumenDocker
+```
+
+Este comando creará un volumen de nombre "volumenDocker" que será utilizado para almacenar los datos del contenedor.
+
+2. Crear un archivo Dockerfile con el siguiente comando:
+
+```bash
+touch Dockerfile
+code ./Dockerfile
+```
+
+
+Este comando creará un archivo Dockerfile en la carpeta actual y abrirá el archivo en el editor de texto VS Code para editarlo.
+3. Editar el archivo Dockerfile con el siguiente contenido:
+
+```dockerfile
+FROM nginx:latest
+
+# Copiar el archivo index.html a la carpeta de documentos de Nginx
+RUN echo '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Francisco López Guerrero. 2023</title><style>body {background-color: black;}</style></head><body><h1 style="color: white; text-align: center;">Francisco López Guerrero. 2023</h1><img src="https://www.aquariumcostadealmeria.com/wp-content/uploads/2019/04/shutterstock_256752703.jpg" alt="Imagen de un cangrejo."></body></html>' > /usr/share/nginx/html/index.html
+
+# Exponer el puerto 80 para que el servidor web sea accesible desde el exterior
+EXPOSE 80
+```
+
+
+
+Este archivo Dockerfile indicará a Docker cómo construir el contenedor y configurar Nginx para servir el archivo index.html en el puerto 81.
+
+4. Construya la imagen de Docker utilizando el siguiente comando:
+
+```
+Copy code
+docker build -t nginx1 .
+```
+5. Ejecute el contenedor de Docker utilizando el siguiente comando, lo que asignará el puerto 80 del host al puerto 80 del contenedor y usará la imagen de nginx1 que acabamos de construir:
+
+```bash
+docker run -p 80:80 nginx1
+```
+6. Abra otra terminal y ejecute el siguiente comando para ejecutar un segundo contenedor de Docker que usará el volumen personalizado que acabamos de crear:
+
+```bash
+docker run -d -p 81:80 --name nginx-container2 -v volumenDocker:/usr/share/nginx/html nginx
+```
+
+Este comando creará un segundo contenedor de Docker utilizando la imagen de nginx y el volumen personalizado que acabamos de crear. Asignará el puerto 81 del host al puerto 80 del contenedor y lo nombrará como nginx-container2.
+Enlace a mi imagen de DockerHub: https://hub.docker.com/repository/docker/craboftw/nginx1/general
+
+¡Listo! Ahora tiene dos contenedores de Docker en ejecución: uno que utiliza la imagen de nginx1 y otro que utiliza el volumen personalizado que
+network error
+
++ ## PARTE 2
+ ## Procedimiento para crear una red y conectar dos contenedores Docker
+1. Crear una nueva red de Docker utilizando el siguiente comando:
+
+```bash
+docker network create DockerNetwork
+```
+2. Crear un contenedor de Ubuntu llamado Ubuntu1 utilizando el siguiente comando:
+
+```bash
+docker run -it --name Ubuntu1 ubuntu /bin/bash
+```
+3. Crear otro contenedor de Ubuntu llamado Ubuntu2 utilizando el siguiente comando:
+
+```bash
+docker run -it --name Ubuntu2 ubuntu /bin/bash
+```
+4. Conectar el contenedor Ubuntu1 a la red DockerNetwork utilizando el siguiente comando:
+
+```bash
+docker network connect DockerNetwork Ubuntu1
+```
+5. Intenta hacer ping desde Ubuntu1 a Ubuntu2. Para ello desde una tercera terminal podemos averiguar la ip haciendo los siguientes comando
+
+```bash
+$ docker inspect   --format '{{ .NetworkSettings.IPAddress }}' Ubuntu1
+```
+Nos devuelve la siguiente ip en mi caso:
+172.17.0.2
+```bash
+$ docker inspect   --format '{{ .NetworkSettings.IPAddress }}' Ubuntu2
+```
+Nos devuelve la siguiente ip en mi caso: 172.17.0.3
+y luego desde la terminal de Ubuntu1 instalamos ping y hacemos ping a Ubuntu2
+
+```bash
+apt-get update -y
+apt-get install -y iputils-ping
+
+ping 172.17.0.2
+```
+```bash
+From 172.17.0.2 icmp_seq=1 Destination Host Unreachable
+```
+
+
+Esto no funcionará, ya que Ubuntu2 no está conectado a la red DockerNetwork. Nos dice que que la ip es inalcanzable.
+
+6. Conectar el contenedor Ubuntu2 a la red DockerNetwork utilizando el siguiente comando:
+
+```bash
+docker network connect DockerNetwork Ubuntu2
+```
+7. Intenta hacer ping desde Ubuntu1 a Ubuntu2 nuevamente utilizando el siguiente comando:
+
+```bash
+ping 172.17.0.2
+```
+```bash
+64 bytes from 172.17.0.2: icmp_seq=1 ttl=64 time=0.322 ms
+```
+
+
+Ahora debería funcionar, ya que ambos contenedores están conectados a la misma red de Docker.
