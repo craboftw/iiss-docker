@@ -448,7 +448,7 @@ docker build -t nginx1 .
 5. Ejecute el contenedor de Docker utilizando el siguiente comando, lo que asignará el puerto 80 del host al puerto 80 del contenedor y usará la imagen de nginx1 que acabamos de construir:
 
 ```bash
-docker run -p 80:80 nginx1
+docker run -p 80:80 nginx 1-v volumenDocker:/usr/share/nginx/html nginx
 ```
 6. Abra otra terminal y ejecute el siguiente comando para ejecutar un segundo contenedor de Docker que usará el volumen personalizado que acabamos de crear:
 
