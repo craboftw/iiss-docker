@@ -441,8 +441,7 @@ Este archivo Dockerfile indicará a Docker cómo construir el contenedor y confi
 
 4. Construya la imagen de Docker utilizando el siguiente comando:
 
-```
-Copy code
+```bash
 docker build -t nginx1 .
 ```
 5. Ejecute el contenedor de Docker utilizando el siguiente comando, lo que asignará el puerto 80 del host al puerto 80 del contenedor y usará la imagen de nginx1 que acabamos de construir:
