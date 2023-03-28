@@ -699,4 +699,4 @@ Una vez que hayas configurado los servicios de MariaDB y WordPress y definido la
 docker-compose up
 ```
 
-Este comando construirá y ejecutará los contenedores de MariaDB y WordPress en la misma red. Una vez que se hayan completado, puedes acceder a WordPress en tu navegador web en la dirección `http://localhost:82`. ![captura](captura2.png)z
+Este comando construirá y ejecutará los contenedores de MariaDB y WordPress en la misma red. Una vez que se hayan completado, puedes acceder a WordPress en tu navegador web en la dirección `http://localhost:82`. ![captura](captura2.png)
