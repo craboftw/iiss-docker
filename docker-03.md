@@ -558,3 +558,145 @@ Upload the file `docker-compose.yml` created and everything needed, and also a P
 3) Make both containers use the `networkDocker` network.
 4) Check that you can access `localhost:82` and can see the wordpress configuration page.
 
+
+
+
+- # Práctica de Docker: Creación de un entorno Drupal con Docker Compose
+## Introducción
+
+En esta práctica, crearemos un entorno de desarrollo local de Drupal usando Docker Compose. Utilizaremos dos servicios: Drupal y MySQL. El servicio de MySQL proporcionará la base de datos para nuestro sitio de Drupal y el servicio de Drupal proporcionará el servidor web para nuestro sitio.
+## Paso 1: Creación del archivo docker-compose.yml
+
+Primero, crearemos un archivo docker-compose.yml en nuestro directorio de trabajo y agregaremos los servicios de MySQL y Drupal.
+
+```yaml
+version: '3'
+services:
+  db:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: drupal
+      MYSQL_USER: drupal
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - volumenDocker:/var/lib/mysql
+  drupal:
+    image: drupal
+    restart: always
+    ports:
+      - "81:80"
+    volumes:
+      - volumenDocker:/var/www/html
+    depends_on:
+      - db
+    environment:
+      DRUPAL_DB_HOST: db
+      DRUPAL_DB_NAME: drupal
+      DRUPAL_DB_USER: drupal
+      DRUPAL_DB_PASSWORD: secret
+volumes:
+  volumenDocker:
+
+```
+
+
+
+En el archivo docker-compose.yml, hemos definido dos servicios, MySQL y Drupal. Para MySQL, hemos utilizado la imagen oficial de MySQL 5.7 y hemos especificado la contraseña de root. Para Drupal, hemos utilizado la imagen oficial de Drupal 9.2.2 con Apache. Hemos expuesto el puerto 81 del contenedor de Drupal al puerto 80 del host y hemos especificado las variables de entorno necesarias para conectar Drupal a MySQL. Finalmente, hemos definido un volumen compartido, volumenDocker, que se utilizará para persistir los datos de MySQL y Drupal.
+## Paso 2: Ejecución del archivo docker-compose.yml
+
+Una vez que hayamos creado el archivo docker-compose.yml, podemos ejecutar el entorno de desarrollo de Drupal usando el siguiente comando:
+
+```bash
+docker-compose up -d
+```
+
+
+
+Este comando ejecutará los servicios de MySQL y Drupal en contenedores separados en segundo plano. El argumento "-d" se utiliza para ejecutar los contenedores en segundo plano.
+## Paso 3: Verificación del entorno de desarrollo
+
+Después de ejecutar el comando "docker-compose up -d", podemos verificar si el entorno de desarrollo de Drupal se ha creado correctamente visitando [http://localhost:81](http://localhost:81/)  en nuestro navegador web.
+
+Si todo ha funcionado correctamente, deberíamos ver la página de configuración de Drupal. Desde aquí, podemos seguir los pasos habituales de configuración de Drupal para crear un nuevo sitio.
+## Paso 4: Detener y eliminar los contenedores
+
+Cuando hayamos terminado de trabajar con nuestro entorno de desarrollo de Drupal, podemos detener y eliminar los contenedores utilizando el siguiente comando:
+
+```bash
+docker-compose down
+```
+
+
+
+Este comando detendrá y eliminará los contenedores de MySQL y Drupal, pero mantendrá los datos almacenados en el volumen compartido volumenDocker.
+
+- # Cómo crear un archivo docker-compose.yml con dos servicios: WordPress + MariaDB
+
+En este guion veremos cómo crear un archivo `docker-compose.yml` que incluye dos servicios: WordPress y MariaDB, y cómo configurarlos para que se ejecuten en la misma red y se comuniquen entre sí. Además, configuraremos el servicio de WordPress para que utilice el puerto 82 en lugar del puerto predeterminado 80.
+### Paso 1: Crear el archivo docker-compose.yml
+
+Lo primero que debes hacer es crear un archivo `docker-compose.yml` en un editor de texto o en tu IDE. Puedes llamar al archivo de la manera que desees, pero asegúrate de que el nombre del archivo sea exactamente `docker-compose.yml`.
+### Paso 2: Configurar el servicio de MariaDB
+
+A continuación, agrega la configuración para el servicio de MariaDB en el archivo `docker-compose.yml`. Para hacerlo, debes incluir la imagen de MariaDB, establecer las variables de entorno necesarias para la configuración de la base de datos de WordPress y definir la red en la que se ejecutará el contenedor de MariaDB. Puedes hacerlo de la siguiente manera:
+
+```yaml
+services:
+  db:
+    image: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: password
+    networks:
+      - redDocker
+```
+
+
+### Paso 3: Configurar el servicio de WordPress
+
+Luego, debes agregar la configuración para el servicio de WordPress en el archivo `docker-compose.yml`. Para hacerlo, debes incluir la imagen de WordPress, establecer las variables de entorno necesarias para que WordPress se conecte a la base de datos de MariaDB y definir el puerto que se usará para acceder a WordPress. También debes asegurarte de que el contenedor de WordPress se conecte a la misma red en la que se ejecuta el contenedor de MariaDB. Puedes hacerlo de la siguiente manera:
+
+```yaml
+services:
+  wordpress:
+    depends_on:
+      - db
+    image: wordpress
+    ports:
+      - "82:80"
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: password
+      WORDPRESS_DB_NAME: wordpress
+    networks:
+      - redDocker
+```
+
+
+### Paso 4: Definir la red en la que se ejecutan los contenedores
+
+Por último, debes definir la red en la que se ejecutan los contenedores de MariaDB y WordPress. Para hacerlo, debes agregar la siguiente configuración al archivo `docker-compose.yml`:
+
+```yaml
+networks:
+  redDocker:
+    driver: bridge
+```
+
+
+### Paso 5: Ejecutar el archivo docker-compose.yml
+
+Una vez que hayas configurado los servicios de MariaDB y WordPress y definido la red en la que se ejecutan los contenedores, estás listo para ejecutar el archivo `docker-compose.yml`. Para hacerlo, abre una terminal en la misma ubicación del archivo y escribe el siguiente comando:
+
+```bash
+docker-compose up
+```
+
+Este comando construirá y ejecutará los contenedores de MariaDB y WordPress en la misma red. Una vez que se hayan completado, puedes acceder a WordPress en tu navegador web en la dirección `http://localhost:82`. ![captura](captura2.png)z
